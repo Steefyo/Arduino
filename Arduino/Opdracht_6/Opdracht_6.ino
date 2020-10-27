@@ -1,76 +1,65 @@
-// Importeer een Library
-#include <Servo.h>
+// Gebruik Library
+#include<Servo.h>
 
-// Definieer de Servo en hoek.
-Servo myservo;
-int angle;
+// Defineer Knoppen / Logica
+const int knop_1 = 13;
+const int knop_2 = 12;
+int logic_knop_1 = LOW;
+int logic_knop_2 = LOW;
 
-// Defineer de knoppen en knop status.
-const int Button1 = 10;
-const int Button2 = 9;
-int buttonState1 = 0;
-int buttonState2= 0;
+// Declareer motor
+Servo servoMotor;
 
-// Vertraging.
-const int incrementDelay = 0.83;
-
+// Zet knop ontvangen aan
+// Zet motor op pin 3
+// Start Serial Monitor
 void setup() {
-  // Zet servo op pin 3.
-  // Zet andere pins open.
-  myservo.attach(3);
-  pinMode(Button1, INPUT);   
-  pinMode(Button2, INPUT);     
+  pinMode(knop_1, INPUT);
+  pinMode(knop_2, INPUT);
+  servoMotor.attach(3);
+  Serial.begin(9600);
 }
 
 void loop() {
-  // Lees de status van de knop uit.
-  buttonState1 = digitalRead(Button1);
-  buttonState2 = digitalRead(Button2);
+  // Sla knop waardes op
+  logic_knop_1 = digitalRead(knop_1);
+  logic_knop_2 = digitalRead(knop_2);
+  Serial.println(logic_knop_1);
+  Serial.println(logic_knop_1);
 
-  // Als knop 1 is ingedrukt.
-  if (buttonState1 == HIGH) { 
-    // Draaisnelheid.
-    int angleIncrement = 1;
-    // Tot doel is bereikt.
-    for (angle = 0; angle < 120; angle += angleIncrement) { 
-       // Draai motor.
-        myservo.write (angle);
-        // vertragingstijd is de variabele.
-      delay (incrementDelay);
-    }   
+  // Welke knop staat aan
+  if (logic_knop_1 == HIGH && logic_knop_2 == LOW){
+    // Laat de servo bewegen
+    servo_logic(8,0);
+  }
+  if (logic_knop_1 == LOW && logic_knop_2 == HIGH){
+    servo_logic(4,0);
+  }
+  if (logic_knop_1 == HIGH && logic_knop_2 == HIGH){
+    servo_logic(8, 2000);
   }
 
-  // Als knop 2 is ingedrukt.
-  else if (buttonState2 == HIGH){
-    // Draaisnelheid.
-    int angleIncrement = 2;
-    // Tot doel is bereikt.
-    for (angle = 0; angle < 120; angle += angleIncrement) {
-        // Draai motor.
-    myservo.write (angle);
-        // vertragingstijd is de variabele.
-    delay (incrementDelay);
-    }
-  }
-  
-  // Als knop 1 en 2 zijn ingedrukt.
-  else if (buttonState2 == HIGH && buttonState1 == HIGH){
-    // Draaisnelheid.
-    int angleIncrement = 2;
-    // Tot doel is bereikt.
-    for (angle = 0; angle < 120; angle += angleIncrement) {
-        // Draai motor.
-    myservo.write (angle);
-        // vertragingstijd.
-    delay (2000);
-    }
-  }
-
-  // Als er geen invoer is.
+  // Geen invoer
   else{
-    myservo.write(0);
+    servoMotor.write(0);
   }
-  
-  // Vertraging.
-  delay(15);
 }
+
+void servo_logic (int snelheid, int tussenstop) {
+  // Als de positie kleiner is dan 120 graden
+  // Positie veranderen
+  // Snelheid van het draaien
+  for (int positie = 0; positie < 120; positie++) {
+    servoMotor.write(positie);
+    delay(snelheid);
+  }
+  // Wachten om terug te draaien
+  delay(tussenstop);
+  // Als de positie groter is dan 0 graden
+  // Positie veranderen
+  // Snelheid van het draaien
+  for (int positie = 120; positie > 0; positie--){
+    servoMotor.write(positie);
+    delay(snelheid);
+  }
+ }
